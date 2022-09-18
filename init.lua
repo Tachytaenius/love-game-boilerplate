@@ -3,6 +3,7 @@ local path = (...):gsub('%.init$', '')
 local settings = require(path .. ".settings")
 local commands = require(path .. ".commands")
 local input = require(path .. ".input")
+local takeScreenshot = require(path .. ".takeScreenshot")
 
 local boilerplate = {}
 
@@ -162,7 +163,12 @@ function boilerplate.init(initConfig, arg)
 		
 		if input.didFrameCommand("takeScreenshot") then
 			-- If uiModifier is held then takeScreenshot will include HUD et cetera.
-			takeScreenshot(input.didFrameCommand("uiModifier") and contentCanvas or scene.outputCanvas)
+			local screenshotCanvas
+			if not boilerplate.getScreenshotCanvas then
+				takeScreenshot(boilerplate.outputCanvas)
+			else				
+				takeScreenshot(input.didFrameCommand("uiModifier") and boilerplate.outputCanvas or boilerplate.getScreenshotCanvas())
+			end
 		end
 		
 		-- if not ui.current or ui.current.type ~= "settings" then

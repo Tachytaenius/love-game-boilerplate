@@ -56,6 +56,10 @@ function boilerplate.draw(lerp, dt)
 	love.graphics.setCanvas()
 end
 
+-- function boilerplate.getScreenshotCanvas()
+-- 	
+-- end
+
 function boilerplate.quit()
 	
 end
