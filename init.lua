@@ -9,14 +9,8 @@ local boilerplate = {}
 boilerplate.settingsTypes = settings("getTypes")
 
 function boilerplate.remakeWindow()
-	local width, height
-	if boilerplate.outputCanvas then
-		width = boilerplate.outputCanvas:getWidth() * settings.graphics.scale
-		height = boilerplate.outputCanvas:getHeight() * settings.graphics.scale
-	else
-		width = boilerplate.outputCanvasWidth * settings.graphics.scale
-		height = boilerplate.outputCanvasHeight * settings.graphics.scale
-	end
+	local width = boilerplate.outputCanvasWidth * settings.graphics.scale
+	local height = boilerplate.outputCanvasHeight * settings.graphics.scale
 	love.window.setMode(width, height, {
 		vsync = settings.graphics.vsync,
 		fullscreen = settings.graphics.fullscreen,
