@@ -74,7 +74,9 @@ function boilerplate.init(initConfig, arg)
 	
 	settingsTemplate.useScancodesForCommands = settingsTemplate.useScancodesForCommands or settingsTypes.boolean(true)
 	
-	settingsTemplate.frameCommands = settingsTemplate.frameCommands or settingsTypes.commands("frame", {
+	settingsTemplate.frameCommands = settingsTemplate.frameCommands or settingsTypes.commands("frame", {})
+	local frameCommandsSettingDefaults = settingsTemplate.frameCommands(nil) -- HACK: Get defaults by calling with settingsTemplate.frameCommands with nil
+	for commandName, inputType in pairs({
 		pause = "escape",
 		
 		toggleMouseGrab = "f1",
@@ -90,7 +92,9 @@ function boilerplate.init(initConfig, arg)
 		uiPrimary = 1,
 		uiSecondary = 2,
 		uiModifier = "lalt"
-	})
+	}) do
+		frameCommandsSettingDefaults[commandName] = frameCommandsSettingDefaults[commandName] or inputType
+	end
 	
 	settings("configure", initConfig.settingsUiLayout, initConfig.settingsTemplate)
 	
