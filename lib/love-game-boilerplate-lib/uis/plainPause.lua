@@ -16,6 +16,9 @@ function plainPause.update(state)
 	if suit.Button("Resume", suit.layout:row(config.canvasSystemWidth / 3, assets.ui.font.value:getHeight() + 3)).hit then
 		return true -- Destroy UI
 	end
+	if suit.Button("Release Mouse", suit.layout:row()).hit then
+		love.mouse.setRelativeMode(false)
+	end
 	if suit.Button("Settings", suit.layout:row()).hit then
 		return true, "settings" -- Replace UI with settings UI
 	end
