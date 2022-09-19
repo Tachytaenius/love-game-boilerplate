@@ -316,7 +316,7 @@ function boilerplate.init(initConfig, arg)
 		if not (boilerplate.quit and boilerplate.quit()) then
 			if boilerplate.getUnsaved and boilerplate.getUnsaved() then
 				if ui.current and ui.current.type == "quitConfirmation" then
-					return config.suppressQuitWithDoubleQuitEvent
+					return config.suppressQuitWithDoubleQuitEvent and not boilerplate.forceQuit
 				else
 					ui.construct("quitConfirmation")
 					return true
