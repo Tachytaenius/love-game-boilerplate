@@ -49,7 +49,11 @@ local initConfig = {
 	uiNamePathPrefix = "uis",
 	uiTint = {0.5, 0.5, 0.5},
 	assets = assets,
-	suppressQuitWithDoubleQuitEvent = true
+	suppressQuitWithDoubleQuitEvent = true,
+	defaultFilterMin = "nearest",
+	defaultFilterMag = nil,
+	defaultFilterAnisotropy = nil,
+	lineStyle = "rough"
 }
 
 local unsaved

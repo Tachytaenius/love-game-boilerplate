@@ -33,7 +33,9 @@ local function paused()
 end
 
 function boilerplate.init(initConfig, arg)
-	love.graphics.setDefaultFilter("nearest", "nearest")
+	love.graphics.setDefaultFilter(initConfig.defaultFilterMin or "nearest", initConfig.defaultFilterMag or initConfig.defaultFilterMin or "nearest", initConfig.defaultFilterAnisotropy)
+	love.graphics.setLineStyle(initConfig.lineStyle or "rough")
+	
 	
 	-- TODO: Make a table for all the input options and verify their presence, perhaps even validate them
 	
