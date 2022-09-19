@@ -17,7 +17,7 @@ local function didCommandBase(name, commandsTable, settingsTable)
 		down = func(assignee)
 	elseif type(assignee) == "number" then
 		if love.mouse.getRelativeMode() then
-			if not require(path).disableMouseUntilReleased then -- HACK to avoid a circular dependency
+			if assignee ~= require(path).disableMouseButtonUntilReleased then -- HACK to avoid a circular dependency
 				down = love.mouse.isDown(assignee)
 			end
 		end
