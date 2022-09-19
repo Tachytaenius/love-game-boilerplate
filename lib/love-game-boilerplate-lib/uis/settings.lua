@@ -90,7 +90,7 @@ function settingsUI.update(state)
 		suit.layout:row(w, h)
 		suit.Label(category.title .. ":", {align = "left"}, suit.layout:row(w, h))
 		rectangles[#rectangles + 1] = {suit.layout._x - pad, suit.layout._y - pad}
-		for _, item in ipairs(category) do
+		for i, item in ipairs(category) do
 			local settingName = item.name
 			local settingState = get(state, unpack(item))
 			
