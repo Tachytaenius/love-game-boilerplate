@@ -1,4 +1,5 @@
 # LÖVE game boilerplate library
+
 This repository contains a runnable example program, the actual library is in `lib/`.
 Said program is intended to serve as part of the documentation for now.
 
@@ -22,4 +23,4 @@ It features:
 
 ## Notes
 
-Some config options are sent straight to their respective systems and not to the config module.
+- Some config options are sent straight to their respective systems and not to the config module.
