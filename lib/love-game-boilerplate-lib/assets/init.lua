@@ -1,4 +1,6 @@
-local function blankImage(r, g, b, a, w, h)
+local utilities = {}
+
+function utilities.blankImage(r, g, b, a, w, h)
 	local w = w or 1
 	local h = w or h
 	local ret = love.image.newImageData(w, h)
@@ -7,6 +9,8 @@ local function blankImage(r, g, b, a, w, h)
 	end)
 	return love.graphics.newImage(ret)
 end
+
+local constructors = {}
 
 local assets = {}
 
@@ -33,8 +37,10 @@ return setmetatable(assets, {
 			for k, v in pairs(select(1, ...)) do
 				assets[k] = v
 			end
+		elseif action == "meta" then
+			return constructors, utilities
 		else
-			error("Assets is to be called with \"load\", \"save\", or \"configure\"")
+			error("Assets is to be called with \"load\", \"save\", \"configure\", or \"meta\"")
 		end
 	end
 })

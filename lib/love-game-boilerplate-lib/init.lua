@@ -15,6 +15,7 @@ local takeScreenshot = require(path .. ".takeScreenshot")
 local boilerplate = {}
 
 boilerplate.settingsTypes = settings("meta")
+boilerplate.assetsConstructors, boilerplate.assetsUtilities = assets("meta")
 
 function boilerplate.remakeWindow()
 	local width = config.canvasSystemWidth * settings.graphics.scale
