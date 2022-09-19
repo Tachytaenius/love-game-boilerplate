@@ -1,6 +1,6 @@
-local path = (...):gsub('%.[^%.]+$', '')
+local path = (...):gsub("%.[^%.]+$", "")
 
-local commands = require(path .. ".commands")
+local config = require(path .. ".config")
 local settings = require(path .. ".settings")
 
 local input = {}
@@ -11,9 +11,17 @@ local function didCommandBase(name, commandsTable, settingsTable)
 	assert(commandsTable[name], name .. " is not a valid command")
 	
 	local assignee = settingsTable[name]
-	if (type(assignee) == "string" and (settings.useScancodes and love.keyboard.isScancodeDown or love.keyboard.isDown)(assignee)) or (type(assignee) == "number" and love.mouse.isGrabbed() and love.mouse.isDown(assignee)) then
-		thisFrameRawCommands[name] = true
+	local down
+	if type(assignee) == "string" then
+		local func = settings.useScancodes and love.keyboard.isScancodeDown or love.keyboard.isDown
+		down = func(assignee)
+	elseif type(assignee) == "number" then
+		if love.mouse.getRelativeMode() then
+			down = love.mouse.isDown(assignee)
+		end
 	end
+	down = not not down
+	thisFrameRawCommands[name] = down
 	
 	local deltaPolicy = commandsTable[name]
 	if deltaPolicy == "onPress" then
@@ -28,7 +36,7 @@ local function didCommandBase(name, commandsTable, settingsTable)
 end
 
 function input.didFrameCommand(name)
-	return didCommandBase(name, commands.frameCommands, settings.frameCommands)
+	return didCommandBase(name, config.frameCommands, settings.frameCommands)
 end
 
 function input.didFixedCommand(name)
@@ -37,8 +45,8 @@ end
 
 function input.stepRawCommands(paused)
 	if not paused then
-		for name, deltaPolicy in pairs(commands.fixedCommands) do
-			local didCommandThisFrame = didCommandBase(name, commands.fixedCommands, settings.fixedCommands)
+		for name, deltaPolicy in pairs(config.fixedCommands) do
+			local didCommandThisFrame = didCommandBase(name, config.fixedCommands, settings.fixedCommands)
 			fixedCommandsList[name] = fixedCommandsList[name] or didCommandThisFrame
 		end
 	end

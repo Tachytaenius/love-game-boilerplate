@@ -1,8 +1,8 @@
-local path = (...):gsub('%.[^%.]+$', '')
+local path = (...):gsub("%.[^%.]+$", "")
 
 local json = require(path .. ".lib.json")
 
-local commands = require(path .. ".commands")
+local config = require(path .. ".config")
 
 local settings = {}
 
@@ -92,7 +92,7 @@ function types.commands(kind, default)
 		if type(try) == "table" then
 			local result = {}
 			for k, v in pairs(try) do
-				if commands[kind .. "Commands"][k] then
+				if config[kind .. "Commands"][k] then
 					if pcall(settings.useScancodesForCommands and love.keyboard.isScancodeDown or love.keyboard.isKeyDown, v) or pcall(love.mouse.isDown, v) then
 						result[k] = v
 					else
@@ -144,16 +144,18 @@ return setmetatable(settings, {
 			traverse(template, decoded, settings)
 		
 		elseif action == "apply" then
-			require(path).remakeWindow() -- Avoid circular dependency error
+			if not select(1, ...) then
+				require(path).remakeWindow() -- Avoid circular dependency error
+			end
 		
-		elseif action == "getTypes" then
-			return types
+		elseif action == "meta" then
+			return types, typeInstanceOrigins, template, uiLayout
 		
 		elseif action == "configure" then
 			uiLayout, template = ...
 		
 		else
-			error("Settings is to be called with either \"save\", \"load\", \"apply\", \"getTypes\", or \"configure\"")
+			error("Settings is to be called with either \"save\", \"load\", \"apply\", \"meta\", or \"configure\"")
 		end
 	end
 })

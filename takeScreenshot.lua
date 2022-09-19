@@ -1,3 +1,5 @@
+-- TODO: Organise into canvasName folders
+
 return function(canvas)
 	local info = love.filesystem.getInfo("screenshots")
 	if not info then

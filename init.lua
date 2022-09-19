@@ -1,17 +1,24 @@
-local path = (...):gsub('%.init$', '')
+local path = (...):gsub("%.init$", "")
+
+require(path .. ".monkeypatch")
+
+local suit = require(path .. ".lib.suit")
 
 local settings = require(path .. ".settings")
-local commands = require(path .. ".commands")
+local config = require(path .. ".config")
 local input = require(path .. ".input")
+local assets = require(path .. ".assets")
+local ui = require(path .. ".ui")
+
 local takeScreenshot = require(path .. ".takeScreenshot")
 
 local boilerplate = {}
 
-boilerplate.settingsTypes = settings("getTypes")
+boilerplate.settingsTypes = settings("meta")
 
 function boilerplate.remakeWindow()
-	local width = boilerplate.outputCanvasWidth * settings.graphics.scale
-	local height = boilerplate.outputCanvasHeight * settings.graphics.scale
+	local width = config.canvasSystemWidth * settings.graphics.scale
+	local height = config.canvasSystemHeight * settings.graphics.scale
 	love.window.setMode(width, height, {
 		vsync = settings.graphics.vsync,
 		fullscreen = settings.graphics.fullscreen,
@@ -20,12 +27,16 @@ function boilerplate.remakeWindow()
 	})
 end
 
+local function paused()
+	return ui.current and ui.current.causesPause
+end
+
 function boilerplate.init(initConfig, arg)
 	love.graphics.setDefaultFilter("nearest", "nearest")
 	
 	-- TODO: Make a table for all the input options and verify their presence, perhaps even validate them
 	
-	boilerplate.outputCanvasWidth, boilerplate.outputCanvasHeight = initConfig.outputCanvasWidth, initConfig.outputCanvasHeight
+	config.canvasSystemWidth, config.canvasSystemHeight = initConfig.canvasSystemWidth, initConfig.canvasSystemHeight
 	
 	-- Merge library-owned frame commands into frameCommands
 	
@@ -46,7 +57,7 @@ function boilerplate.init(initConfig, arg)
 	frameCommands.uiSecondary = frameCommands.uiSecondary or "whileDown"
 	frameCommands.uiModifier = frameCommands.uiModifier or "whileDown"
 	
-	-- Merge library-owned settings into settingsUiLayout
+	-- TODO: Merge library-owned settings layout into settingsUiLayout, respecting categories! It will have to be decomposed into another format and recomposed into the settingsUiLayout format.
 	
 	-- Merge library-owned settings into settingsTemplate
 	
@@ -91,15 +102,21 @@ function boilerplate.init(initConfig, arg)
 		frameCommandsSettingDefaults[commandName] = frameCommandsSettingDefaults[commandName] or inputType
 	end
 	
+	assets("configure", initConfig.assets)
 	settings("configure", initConfig.settingsUiLayout, initConfig.settingsTemplate)
 	
-	commands.frameCommands = initConfig.frameCommands
-	commands.fixedCommands = initConfig.fixedCommands
+	config.frameCommands = initConfig.frameCommands
+	config.fixedCommands = initConfig.fixedCommands
+	
+	ui.configure(initConfig.uiNames, initConfig.uiNamePathPrefix)
+	
+	local mouseMovedDt
 	
 	function love.run()
 		love.load(love.arg.parseGameArguments(arg), arg)
 		local lag = initConfig.fixedUpdateTickLength
 		local updatesSinceLastDraw, lastLerp = 0, 1
+		local performance
 		love.timer.step()
 		
 		return function()
@@ -115,17 +132,26 @@ function boilerplate.init(initConfig, arg)
 			
 			do -- Update
 				local delta = love.timer.step()
+				mouseMovedDt = delta -- HACK
 				lag = math.min(lag + delta, initConfig.fixedUpdateTickLength * settings.graphics.maxTicksPerFrame)
 				local frames = math.floor(lag / initConfig.fixedUpdateTickLength)
 				lag = lag % initConfig.fixedUpdateTickLength
-				love.update(dt)
-				if not paused then
+				if not paused() then
 					local start = love.timer.getTime()
 					for _=1, frames do
 						updatesSinceLastDraw = updatesSinceLastDraw + 1
 						love.fixedUpdate(initConfig.fixedUpdateTickLength)
 					end
+					if frames ~= 0 then
+						performance = (love.timer.getTime() - start) / (frames * initConfig.fixedUpdateTickLength)
+					end
+				else
+					performance = nil
+					if previousFramePaused then
+						input.clearFixedCommandsList()
+					end
 				end
+				love.update(dt, performance)
 			end
 			
 			if love.graphics.isActive() then -- Rendering
@@ -134,7 +160,7 @@ function boilerplate.init(initConfig, arg)
 				
 				local lerp = lag / initConfig.fixedUpdateTickLength
 				deltaDrawTime = ((lerp + updatesSinceLastDraw) - lastLerp) * initConfig.fixedUpdateTickLength
-				love.draw(lerp, deltaDrawTime)
+				love.draw(lerp, deltaDrawTime, performance)
 				updatesSinceLastDraw, lastLerp = 0, lerp
 				
 				love.graphics.present()
@@ -148,7 +174,11 @@ function boilerplate.init(initConfig, arg)
 		settings("load")
 		settings("apply")
 		settings("save")
-		boilerplate.outputCanvas = love.graphics.newCanvas(boilerplate.outputCanvasWidth, boilerplate.outputCanvasHeight)
+		assets("load")
+		love.graphics.setFont(assets.ui.font.value)
+		boilerplate.inputCanvas = love.graphics.newCanvas(config.canvasSystemWidth, config.canvasSystemHeight)
+		boilerplate.outputCanvas = love.graphics.newCanvas(config.canvasSystemWidth, config.canvasSystemHeight)
+		boilerplate.infoCanvas = love.graphics.newCanvas(config.canvasSystemWidth, config.canvasSystemHeight)
 		input.clearRawCommands()
 		input.clearFixedCommandsList()
 		if boilerplate.load then
@@ -157,6 +187,16 @@ function boilerplate.init(initConfig, arg)
 	end
 	
 	function love.update(dt)
+		if input.didFrameCommand("pause") then
+			if ui.current then
+				if not ui.current.ignorePausePress then
+					ui.destroy()
+				end
+			else
+				ui.construct("plainPause")
+			end
+		end
+		
 		if input.didFrameCommand("toggleMouseGrab") then
 			love.mouse.setRelativeMode(not love.mouse.getRelativeMode())
 		end
@@ -164,14 +204,10 @@ function boilerplate.init(initConfig, arg)
 		if input.didFrameCommand("takeScreenshot") then
 			-- If uiModifier is held then takeScreenshot will include HUD et cetera.
 			local screenshotCanvas
-			if not boilerplate.getScreenshotCanvas then
-				takeScreenshot(boilerplate.outputCanvas)
-			else				
-				takeScreenshot(input.didFrameCommand("uiModifier") and boilerplate.outputCanvas or boilerplate.getScreenshotCanvas())
-			end
+			takeScreenshot(input.didFrameCommand("uiModifier") and boilerplate.outputCanvas or boilerplate.inputCanvas)
 		end
 		
-		-- if not ui.current or ui.current.type ~= "settings" then
+		if not ui.current or ui.current.type ~= "settings" then
 			if input.didFrameCommand("toggleInfo") then
 				settings.graphics.showPerformance = not settings.graphics.showPerformance
 				settings("save")
@@ -206,13 +242,17 @@ function boilerplate.init(initConfig, arg)
 				settings("apply")
 				settings("save")
 			end
-		-- end
+		end
+		
+		if ui.current then
+			ui.update()
+		end
 		
 		if boilerplate.update then
 			boilerplate.update(dt)
 		end
 		
-		input.stepRawCommands(--[=[paused()]=])
+		input.stepRawCommands(paused())
 	end
 	
 	function love.fixedUpdate(dt)
@@ -220,25 +260,79 @@ function boilerplate.init(initConfig, arg)
 			boilerplate.fixedUpdate(dt)
 		end
 		
+		boilerplate.fixedMouseDx, boilerplate.fixedMouseDy = 0, 0
 		input.clearFixedCommandsList()
 	end
 	
-	function love.draw(lerp, dt)
-		assert(boilerplate.outputCanvas:getWidth() == boilerplate.outputCanvasWidth)
-		assert(boilerplate.outputCanvas:getHeight() == boilerplate.outputCanvasHeight)
-		if boilerplate.draw then
-			boilerplate.draw(lerp, dt)
+	function love.draw(lerp, dt, performance)
+		assert(boilerplate.outputCanvas:getWidth() == config.canvasSystemWidth)
+		assert(boilerplate.outputCanvas:getHeight() == config.canvasSystemHeight)
+		if settings.graphics.showPerformance then
+			love.graphics.setCanvas(boilerplate.infoCanvas)
+			love.graphics.clear(0, 0, 0, 0)
+			love.graphics.print(
+				"FPS: " .. love.timer.getFPS() .. "\n" ..
+				-- "Garbage: " .. collectgarbage("count") * 1024 -- counts all memory for some reason
+				"Tick time: " .. (performance and math.floor(performance * 100 + 0.5) .. "%" or "N/A"),
+			1, 1)
 		end
+		if boilerplate.draw and not paused() then
+			-- Draw to input canvas
+			boilerplate.draw(settings.graphics.interpolation and lerp or 1, dt, performance)
+		end
+		love.graphics.setCanvas(boilerplate.outputCanvas)
+		love.graphics.clear()
+		if ui.current then love.graphics.setColor(initConfig.uiTint or {1, 1, 1}) end
+		love.graphics.draw(boilerplate.inputCanvas)
+		if settings.graphics.showPerformance then
+			love.graphics.setColor(1, 1, 1)
+			love.graphics.setShader(boilerplate.outlineShader)
+			love.graphics.draw(boilerplate.infoCanvas, 1, 1)
+			love.graphics.setShader()
+		end
+		if ui.current then
+			suit.draw()
+			if ui.current.draw then
+				ui.current.draw() -- stuff SUIT can't do: rectangles, lines, etc
+			end
+			love.graphics.setColor(settings.mouse.cursorColour)
+			love.graphics.draw(assets.ui.cursor.value, math.floor(ui.current.mouseX), math.floor(ui.current.mouseY))
+		else
+			-- draw HUD
+		end
+		love.graphics.setColor(1, 1, 1)
+		love.graphics.setCanvas()
+		
 		love.graphics.draw(boilerplate.outputCanvas,
-			love.graphics.getWidth() / 2 - (boilerplate.outputCanvasWidth * settings.graphics.scale) / 2, -- topLeftX == centreX - width / 2
-			love.graphics.getHeight() / 2 - (boilerplate.outputCanvasHeight * settings.graphics.scale) / 2,
+			love.graphics.getWidth() / 2 - (config.canvasSystemWidth * settings.graphics.scale) / 2, -- topLeftX == centreX - width / 2
+			love.graphics.getHeight() / 2 - (config.canvasSystemHeight * settings.graphics.scale) / 2,
 			0, settings.graphics.scale
 		)
 	end
 	
 	function love.quit()
-		-- TODO: Test
-		return boilerplate.quit and boilerplate.quit()
+		if not (boilerplate.quit and boilerplate.quit()) then
+			if boilerplate.getUnsaved and boilerplate.getUnsaved() then
+				-- TODO: Add config option for disabling double alt-f4 to quit without saving
+				if ui.current and ui.current.type == "quitConfirmation" then
+					return false
+				else
+					ui.construct("quitConfirmation")
+					return true
+				end
+			end
+		end
+	end
+	
+	function love.mousemoved(x, y, dx, dy)
+		if love.window.hasFocus() and love.window.hasMouseFocus() and love.mouse.getRelativeMode() then
+			if ui.current then
+				ui.mouse(dx, dy)
+			else
+				boilerplate.fixedMouseDx = boilerplate.fixedMouseDx + dx * mouseMovedDt
+				boilerplate.fixedMouseDy = boilerplate.fixedMouseDy + dy * mouseMovedDt
+			end
+		end
 	end
 end
 
