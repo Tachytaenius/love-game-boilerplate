@@ -334,6 +334,17 @@ function boilerplate.init(initConfig, arg)
 			end
 		end
 	end
+	
+	function love.mousepressed(x, y, button, isTouch)
+		if not love.mouse.getRelativeMode() then
+			love.mouse.setRelativeMode(true)
+			boilerplate.disableMouseUntilReleased = true
+		end
+	end
+	
+	function love.mousereleased(x, y, button, isTouch)
+		boilerplate.disableMouseUntilReleased = false
+	end
 end
 
 return boilerplate
