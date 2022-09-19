@@ -33,11 +33,11 @@ local function paused()
 end
 
 function boilerplate.init(initConfig, arg)
+	-- NOTE: initConfig is modified in some places
+	-- TODO: Make a table for all the input options and verify their presence, perhaps even validate them
+	
 	love.graphics.setDefaultFilter(initConfig.defaultFilterMin or "nearest", initConfig.defaultFilterMag or initConfig.defaultFilterMin or "nearest", initConfig.defaultFilterAnisotropy)
 	love.graphics.setLineStyle(initConfig.lineStyle or "rough")
-	
-	
-	-- TODO: Make a table for all the input options and verify their presence, perhaps even validate them
 	
 	config.canvasSystemWidth, config.canvasSystemHeight = initConfig.canvasSystemWidth, initConfig.canvasSystemHeight
 	
@@ -60,7 +60,33 @@ function boilerplate.init(initConfig, arg)
 	frameCommands.uiSecondary = frameCommands.uiSecondary or "whileDown"
 	frameCommands.uiModifier = frameCommands.uiModifier or "whileDown"
 	
-	-- TODO: Merge library-owned settings layout into settingsUiLayout, respecting categories! It will have to be decomposed into another format and recomposed into the settingsUiLayout format.
+	-- Merge library-owned settings layout into settingsUiLayout, with library-owned settings layout entries first
+	
+	local settingsUiLayout = {
+		{title = "Graphics",
+			{name = "Fullscreen", "graphics","fullscreen"},
+			{name = "Interpolation", "graphics","interpolation"}
+		}
+	}
+	
+	for _, category in ipairs(initConfig.settingsUiLayout) do
+		local libraryCategory
+		for _, libraryCategory_ in ipairs(settingsUiLayout) do
+			if category.title == libraryCategory_.title then
+				libraryCategory = libraryCategory_
+				break
+			end
+		end
+		if not libraryCategory then
+			libraryCategory = {title = category.title}
+			settingsUiLayout[#settingsUiLayout + 1] = libraryCategory
+		end
+		for _, item in ipairs(category) do
+			libraryCategory[#libraryCategory + 1] = item
+		end
+	end
+	
+	initConfig.settingsUiLayout = settingsUiLayout
 	
 	-- Merge library-owned settings into settingsTemplate
 	

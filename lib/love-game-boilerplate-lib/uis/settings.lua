@@ -85,13 +85,12 @@ function settingsUI.update(state)
 	
 	suit.layout:reset(x, y + h, pad)
 	
-	for i, item in ipairs(uiLayout) do
-		if type(item) == "string" then 
-			finishRect()
-			suit.layout:row(w, h)
-			suit.Label(item .. ":", {align = "left"}, suit.layout:row(w, h))
-			rectangles[#rectangles + 1] = {suit.layout._x - pad, suit.layout._y - pad}
-		elseif type(item) == "table" then
+	for _, category in ipairs(uiLayout) do
+		finishRect()
+		suit.layout:row(w, h)
+		suit.Label(category.title .. ":", {align = "left"}, suit.layout:row(w, h))
+		rectangles[#rectangles + 1] = {suit.layout._x - pad, suit.layout._y - pad}
+		for _, item in ipairs(category) do
 			local settingName = item.name
 			local settingState = get(state, unpack(item))
 			
@@ -108,8 +107,7 @@ function settingsUI.update(state)
 				end
 				suit.Label(item.name, {align = "right"}, x,y,w,h)
 			end
-		else
-			error("String or table only in settings UI layout, not " .. type(item))
+			-- TODO: Implement more settings types
 		end
 	end
 	

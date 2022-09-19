@@ -9,10 +9,7 @@ local fixedCommands = {
 }
 
 local settingsUiLayout = {
-	-- TEMP: You have to set up the UI layout for library-owned settings yourself (TODO)
-	"Graphics",
-	{name = "Fullscreen", "graphics","fullscreen"},
-	{name = "Interpolation", "graphics","interpolation"}
+	
 }
 
 local settingsTypes = boilerplate.settingsTypes
