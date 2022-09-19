@@ -69,9 +69,14 @@ function boilerplate.fixedUpdate(dt)
 end
 
 function boilerplate.draw(lerp, dt, performance)
-	love.graphics.setCanvas(boilerplate.inputCanvas)
+	love.graphics.setCanvas(boilerplate.gameCanvas)
 	love.graphics.clear()
+	-- Draw world
+	love.graphics.setCanvas()
 	
+	love.graphics.setCanvas(boilerplate.hudCanvas)
+	love.graphics.clear()
+	-- Draw HUD
 	love.graphics.setCanvas()
 end
 

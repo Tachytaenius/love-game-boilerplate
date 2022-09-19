@@ -148,6 +148,7 @@ function boilerplate.init(initConfig, arg)
 		local lag = initConfig.fixedUpdateTickLength
 		local updatesSinceLastDraw, lastLerp = 0, 1
 		local performance
+		local previousFramePaused
 		love.timer.step()
 		
 		return function()
@@ -182,7 +183,8 @@ function boilerplate.init(initConfig, arg)
 						input.clearFixedCommandsList()
 					end
 				end
-				love.update(dt, performance)
+				previousFramePaused = ui.current and ui.current.causesPause
+				love.update(delta, performance)
 			end
 			
 			if love.graphics.isActive() then -- Rendering
@@ -190,7 +192,7 @@ function boilerplate.init(initConfig, arg)
 				love.graphics.clear(love.graphics.getBackgroundColor())
 				
 				local lerp = lag / initConfig.fixedUpdateTickLength
-				deltaDrawTime = ((lerp + updatesSinceLastDraw) - lastLerp) * initConfig.fixedUpdateTickLength
+				local deltaDrawTime = ((lerp + updatesSinceLastDraw) - lastLerp) * initConfig.fixedUpdateTickLength
 				love.draw(lerp, deltaDrawTime, performance)
 				updatesSinceLastDraw, lastLerp = 0, lerp
 				
@@ -207,9 +209,10 @@ function boilerplate.init(initConfig, arg)
 		settings("save")
 		assets("load")
 		love.graphics.setFont(assets.ui.font.value)
-		boilerplate.inputCanvas = love.graphics.newCanvas(config.canvasSystemWidth, config.canvasSystemHeight)
-		boilerplate.outputCanvas = love.graphics.newCanvas(config.canvasSystemWidth, config.canvasSystemHeight)
+		boilerplate.gameCanvas = love.graphics.newCanvas(config.canvasSystemWidth, config.canvasSystemHeight)
+		boilerplate.hudCanvas = love.graphics.newCanvas(config.canvasSystemWidth, config.canvasSystemHeight)
 		boilerplate.infoCanvas = love.graphics.newCanvas(config.canvasSystemWidth, config.canvasSystemHeight)
+		boilerplate.outputCanvas = love.graphics.newCanvas(config.canvasSystemWidth, config.canvasSystemHeight)
 		input.clearRawCommands()
 		input.clearFixedCommandsList()
 		if boilerplate.load then
@@ -234,8 +237,7 @@ function boilerplate.init(initConfig, arg)
 		
 		if input.didFrameCommand("takeScreenshot") then
 			-- If uiModifier is held then takeScreenshot will include HUD et cetera.
-			local screenshotCanvas
-			takeScreenshot(input.didFrameCommand("uiModifier") and boilerplate.outputCanvas or boilerplate.inputCanvas)
+			takeScreenshot(input.didFrameCommand("uiModifier") and boilerplate.outputCanvas or boilerplate.gameCanvas)
 		end
 		
 		if not ui.current or ui.current.type ~= "settings" then
@@ -296,8 +298,6 @@ function boilerplate.init(initConfig, arg)
 	end
 	
 	function love.draw(lerp, dt, performance)
-		assert(boilerplate.outputCanvas:getWidth() == config.canvasSystemWidth)
-		assert(boilerplate.outputCanvas:getHeight() == config.canvasSystemHeight)
 		if settings.graphics.showPerformance then
 			love.graphics.setCanvas(boilerplate.infoCanvas)
 			love.graphics.clear(0, 0, 0, 0)
@@ -313,8 +313,10 @@ function boilerplate.init(initConfig, arg)
 		end
 		love.graphics.setCanvas(boilerplate.outputCanvas)
 		love.graphics.clear()
-		if ui.current then love.graphics.setColor(initConfig.uiTint or {1, 1, 1}) end
-		love.graphics.draw(boilerplate.inputCanvas)
+		if ui.current then
+			love.graphics.setColor(initConfig.uiTint or {1, 1, 1})
+		end
+		love.graphics.draw(boilerplate.gameCanvas)
 		if settings.graphics.showPerformance then
 			love.graphics.setColor(1, 1, 1)
 			love.graphics.setShader(boilerplate.outlineShader)
@@ -329,7 +331,7 @@ function boilerplate.init(initConfig, arg)
 			love.graphics.setColor(settings.mouse.cursorColour)
 			love.graphics.draw(assets.ui.cursor.value, math.floor(ui.current.mouseX), math.floor(ui.current.mouseY))
 		else
-			-- draw HUD
+			love.graphics.draw(boilerplate.hudCanvas)
 		end
 		love.graphics.setColor(1, 1, 1)
 		love.graphics.setCanvas()

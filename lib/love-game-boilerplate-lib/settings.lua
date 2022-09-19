@@ -115,7 +115,9 @@ return setmetatable(settings, {
 	__call = function(settings, action, ...)
 		if action == "save" then
 			local success, message = love.filesystem.write("settings.json", json.encode(settings))
-			if not success then print(message) end -- TODO: UX(?)
+			if not success then
+				print(message) -- TODO: UX(?)
+			end
 		
 		elseif action == "load" then
 			local info = love.filesystem.getInfo("settings.json")
