@@ -110,6 +110,8 @@ function boilerplate.init(initConfig, arg)
 	
 	ui.configure(initConfig.uiNames, initConfig.uiNamePathPrefix)
 	
+	config.suppressQuitWithDoubleQuitEvent = initConfig.suppressQuitWithDoubleQuitEvent
+	
 	local mouseMovedDt
 	
 	function love.run()
@@ -313,9 +315,8 @@ function boilerplate.init(initConfig, arg)
 	function love.quit()
 		if not (boilerplate.quit and boilerplate.quit()) then
 			if boilerplate.getUnsaved and boilerplate.getUnsaved() then
-				-- TODO: Add config option for disabling double alt-f4 to quit without saving
 				if ui.current and ui.current.type == "quitConfirmation" then
-					return false
+					return config.suppressQuitWithDoubleQuitEvent
 				else
 					ui.construct("quitConfirmation")
 					return true

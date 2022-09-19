@@ -41,7 +41,8 @@ local initConfig = {
 	uiNames = uiNames,
 	uiNamePathPrefix = "uis",
 	uiTint = {0.5, 0.5, 0.5},
-	assets = assets
+	assets = assets,
+	suppressQuitWithDoubleQuitEvent = true
 }
 
 local unsaved
