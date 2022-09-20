@@ -70,7 +70,7 @@ end
 
 function boilerplate.draw(lerp, dt, performance)
 	love.graphics.setCanvas(boilerplate.gameCanvas)
-	love.graphics.clear()
+	love.graphics.clear(0, 0, 0, 1)
 	-- Draw world
 	love.graphics.setCanvas()
 	

@@ -322,7 +322,7 @@ function boilerplate.init(initConfig, arg)
 	function love.draw(lerp, dt, performance)
 		if settings.graphics.showPerformance then
 			love.graphics.setCanvas(boilerplate.infoCanvas)
-			love.graphics.clear(0, 0, 0, 0)
+			love.graphics.clear()
 			love.graphics.print(
 				"FPS: " .. love.timer.getFPS() .. "\n" ..
 				-- "Garbage: " .. collectgarbage("count") * 1024 -- counts all memory for some reason
@@ -334,7 +334,7 @@ function boilerplate.init(initConfig, arg)
 			boilerplate.draw(settings.graphics.interpolation and lerp or 1, dt, performance)
 		end
 		love.graphics.setCanvas(boilerplate.outputCanvas)
-		love.graphics.clear()
+		love.graphics.clear(0, 0, 0, 1)
 		if ui.current then
 			love.graphics.setColor(initConfig.uiTint or {1, 1, 1})
 		end
