@@ -23,7 +23,6 @@ local uiNames = {
 	
 }
 
-
 local assetsConstructors, assetsUtilities = boilerplate.assetsConstructors, boilerplate.assetsUtilities
 local assets = {
 	ui = {
