@@ -111,6 +111,22 @@ function types.commands(kind, default)
 	return instance
 end
 
+local function loadDecoded(decoded)
+	local function traverse(currentTemplate, currentDecoded, currentResult)
+		for k, v in pairs(currentTemplate) do
+			if type(v) == "table" then
+				currentResult[k] = currentResult[k] or {}
+				traverse(v, currentDecoded and currentDecoded[k] or nil, currentResult[k])
+			elseif type(v) == "function" then
+				currentResult[k] = v(currentDecoded and currentDecoded[k])
+			else
+				error(v .. "is not a valid value in the settings template")
+			end
+		end
+	end
+	traverse(template, decoded, settings)
+end
+
 return setmetatable(settings, {
 	__call = function(settings, action, ...)
 		if action == "save" then
@@ -131,24 +147,15 @@ return setmetatable(settings, {
 			else
 				print("Couldn't find settings.json, creating")
 			end
-			local function traverse(currentTemplate, currentDecoded, currentResult)
-				for k, v in pairs(currentTemplate) do
-					if type(v) == "table" then
-						currentResult[k] = currentResult[k] or {}
-						traverse(v, currentDecoded and currentDecoded[k] or nil, currentResult[k])
-					elseif type(v) == "function" then
-						currentResult[k] = v(currentDecoded and currentDecoded[k])
-					else
-						error(v .. "is not a valid value in the settings template")
-					end
-				end
-			end
-			traverse(template, decoded, settings)
+			loadDecoded(decoded)
 		
 		elseif action == "apply" then
 			if not select(1, ...) then
 				require(path).remakeWindow() -- Avoid circular dependency error
 			end
+		
+		elseif action == "reset" then
+			loadDecoded({})
 		
 		elseif action == "meta" then
 			return types, typeInstanceOrigins, template, uiLayout
@@ -157,7 +164,7 @@ return setmetatable(settings, {
 			uiLayout, template = ...
 		
 		else
-			error("Settings is to be called with either \"save\", \"load\", \"apply\", \"meta\", or \"configure\"")
+			error("Settings is to be called with either \"save\", \"load\", \"apply\", \"reset\", \"meta\", \"configure\"")
 		end
 	end
 })

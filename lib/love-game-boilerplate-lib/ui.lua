@@ -23,7 +23,8 @@ function ui.construct(type)
 	ui.current = {
 		type = type,
 		mouseX = ui.current and ui.current.mouseX or config.canvasSystemWidth / 2,
-		mouseY = ui.current and ui.current.mouseY or config.canvasSystemHeight / 2
+		mouseY = ui.current and ui.current.mouseY or config.canvasSystemHeight / 2,
+		scrollAmountY = 0
 	}
 	
 	ui.uis[type].construct(ui.current)
@@ -57,6 +58,8 @@ function ui.update()
 		else
 			ui.destroy()
 		end
+	else
+		ui.current.scrollAmountY = 0
 	end
 end
 

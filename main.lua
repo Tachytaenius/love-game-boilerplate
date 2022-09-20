@@ -47,7 +47,8 @@ local initConfig = {
 	defaultFilterMin = "nearest",
 	defaultFilterMag = nil,
 	defaultFilterAnisotropy = nil,
-	lineStyle = "rough"
+	lineStyle = "rough",
+	scrollSpeed = 20
 }
 
 local unsaved

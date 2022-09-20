@@ -8,13 +8,11 @@ local settings = require(path .. ".settings")
 
 local types, typeInstanceOrigins, template, uiLayout = settings("meta")
 
-local trueButton, falseButton
-
 local settingsUI = {}
 
 function settingsUI.construct(state)
-	trueButton, falseButton = assets.ui.trueButton, assets.ui.falseButton
 	state.causesPause = true
+	state.scrollOffset = 0
 	state.changes = {}
 end
 
@@ -48,9 +46,26 @@ local function set(state, to, ...)
 	current[select(len, ...)] = to
 end
 
+local function applyChanges(changes)
+	local function traverse(currentChanges, currentSettings, currentTemplate)
+		for k, v in pairs(currentChanges) do
+			if type(currentTemplate[k]) == "table" then
+				 -- Another category to traverse
+				traverse(v, currentSettings[k], currentTemplate[k])
+			else--if type(currentTemplate[k]) == "function"
+				-- A setting to change
+				currentSettings[k] = v
+			end
+		end
+	end
+	traverse(changes, settings, template)
+end
+
 function settingsUI.update(state)
 	local x, y = config.canvasSystemWidth / 3, config.canvasSystemHeight / 12
 	local w, h = config.canvasSystemWidth / 3, assets.ui.font.value:getHeight() + 3
+	state.scrollOffset = math.min(0, state.scrollOffset + state.scrollAmountY * config.scrollSpeed)
+	y = y + state.scrollOffset
 	local pad = 4
 	suit.layout:reset(x, y, pad)
 	
@@ -65,25 +80,28 @@ function settingsUI.update(state)
 		return true, "plainPause"
 	end
 	if suit.Button("OK", suit.layout:col()).hit then
-		local function traverse(currentChanges, currentSettings, currentTemplate)
-			for k, v in pairs(currentChanges) do
-				if type(currentTemplate[k]) == "table" then
-					 -- Another category to traverse
-					traverse(v, currentSettings[k], currentTemplate[k])
-				else--if type(currentTemplate[k]) == "function"
-					-- A setting to change
-					currentSettings[k] = v
-				end
-			end
-		end
-		traverse(state.changes, settings, template)
-		
+		applyChanges(state.changes)
 		settings("apply", suppressRemakeWindow) -- TODO: Define the variable
 		settings("save")
 		return true, "plainPause"
 	end
+	suit.layout:reset(x, y + h + pad, pad)
+	if suit.Button("Reset", suit.layout:row(w/2-pad/2, h)).hit then
+		state.changes = {}
+		settings("reset")
+		settings("apply")
+		settings("save")
+	end
+	if suit.Button("Apply", suit.layout:col()).hit then
+		applyChanges(state.changes)
+		settings("apply")
+		settings("save")
+		state.changes = {}
+	end
 	
-	suit.layout:reset(x, y + h, pad)
+	suit.layout:reset(x, y + h + pad * 2, pad)
+	
+	local id = 1
 	
 	for _, category in ipairs(uiLayout) do
 		finishRect()
@@ -102,16 +120,18 @@ function settingsUI.update(state)
 			local settingType = typeInstanceOrigins[current]
 			local x,y,w,h=suit.layout:row(w, h)
 			if settingType == types.boolean then
-				if suit.Checkbox({checked = settingState, text = item.name}, {id = i}, x,y,w,h).hit then
+				if suit.Checkbox({checked = settingState, text = item.name}, {id = id}, x,y,w,h).hit then
 					set(state, not settingState, unpack(item))
 				end
+				id = id + 1
 			elseif settingType == types.natural then
 				suit.Label(item.name .. ": (" .. settingState .. "/" .. item.getLimit() .. ")", {align = "left"}, x,y,w,h)
 				x,y,w,h=suit.layout:row(w, h)
 				local sliderSettings = {value = settingState, min = 1, max = item.getLimit(), step = 1}
 				-- if --[=[suit.Slider call]=].changed then
 				-- The above line is not used because settings.graphics.scale's limit changes depending on the current display, which can be changed by moving the window while in the settings menu which does not refresh
-				suit.Slider(sliderSettings, {id = i}, x,y,w,h)
+				suit.Slider(sliderSettings, {id = id}, x,y,w,h)
+				id = id + 1
 				set(state, math.min(item.getLimit(), math.floor(sliderSettings.value + 0.5)), unpack(item))
 			elseif settingsType == types.rgb then
 				-- TODO

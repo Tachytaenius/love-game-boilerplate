@@ -66,6 +66,8 @@ function boilerplate.init(initConfig, arg)
 	frameCommands.uiPrimary = frameCommands.uiPrimary or "whileDown"
 	frameCommands.uiSecondary = frameCommands.uiSecondary or "whileDown"
 	frameCommands.uiModifier = frameCommands.uiModifier or "whileDown"
+	frameCommands.uiScrollUp = frameCommands.uiScrollUp or "whileDown"
+	frameCommands.uiScrollDown = frameCommands.uiScrollDown or "whileDown"
 	
 	-- Merge library-owned settings layout into settingsUiLayout, with library-owned settings layout entries first
 	
@@ -83,6 +85,12 @@ function boilerplate.init(initConfig, arg)
 			{name = "X Sensitivity", "mouse","xSensitivity"},
 			{name = "Y Sensitivity", "mouse","ySensitivity"},
 			{name = "Cursor Colour", "mouse","cursorColour"}
+		},
+		
+		{title = "Controls",
+			{name = "Use Scancodes for Keys", "useScancodesForCommands"},
+			{name = "Frame Commands", "frameCommands"},
+			{named = "Fixed Commands", "fixedCommands"}
 		}
 	}
 	
@@ -142,8 +150,7 @@ function boilerplate.init(initConfig, arg)
 		toggleFullscreen = "f11",
 		
 		uiPrimary = 1,
-		uiSecondary = 2,
-		uiModifier = "lalt"
+		uiSecondary = 2
 	}) do
 		frameCommandsSettingDefaults[commandName] = frameCommandsSettingDefaults[commandName] or inputType
 	end
@@ -157,6 +164,7 @@ function boilerplate.init(initConfig, arg)
 	ui.configure(initConfig.uiNames, initConfig.uiNamePathPrefix)
 	
 	config.suppressQuitWithDoubleQuitEvent = initConfig.suppressQuitWithDoubleQuitEvent
+	config.scrollSpeed = initConfig.scrollSpeed or 20
 	
 	local mouseMovedDt
 	
@@ -393,6 +401,12 @@ function boilerplate.init(initConfig, arg)
 	
 	function love.mousereleased(x, y, button, isTouch)
 		boilerplate.disableMouseButtonUntilReleased = nil
+	end
+	
+	function love.wheelmoved(x, y)
+		if ui.current then
+			ui.current.scrollAmountY = y -- Unset in ui.update
+		end
 	end
 end
 
