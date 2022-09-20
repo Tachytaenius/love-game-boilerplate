@@ -62,11 +62,11 @@ local function applyChanges(changes)
 end
 
 function settingsUI.update(state)
-	local x, y = config.canvasSystemWidth / 3, config.canvasSystemHeight / 12
-	local w, h = config.canvasSystemWidth / 3, assets.ui.font.value:getHeight() + 3
+	local pad = 4
+	local x, y = config.canvasSystemWidth / 3, pad
+	local w, h = config.canvasSystemWidth / 3, assets.ui.font.value:getHeight() + pad
 	state.scrollOffset = math.min(0, state.scrollOffset + state.scrollAmountY * config.scrollSpeed)
 	y = y + state.scrollOffset
-	local pad = 4
 	suit.layout:reset(x, y, pad)
 	
 	local rectangles = {}
