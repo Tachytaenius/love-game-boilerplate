@@ -52,8 +52,6 @@ function boilerplate.init(initConfig, arg)
 	
 	local frameCommands = initConfig.frameCommands
 	
-	frameCommands.pause = frameCommands.pause or "onRelease"
-	
 	frameCommands.toggleMouseGrab = frameCommands.toggleMouseGrab or "onRelease"
 	frameCommands.takeScreenshot = frameCommands.takeScreenshot or "onRelease"
 	frameCommands.toggleInfo = frameCommands.toggleInfo or "onRelease"
@@ -63,8 +61,6 @@ function boilerplate.init(initConfig, arg)
 	frameCommands.scaleUp = frameCommands.scaleUp or "onRelease"
 	frameCommands.toggleFullscreen = frameCommands.toggleFullscreen or "onRelease"
 	
-	frameCommands.uiPrimary = frameCommands.uiPrimary or "whileDown"
-	frameCommands.uiSecondary = frameCommands.uiSecondary or "whileDown"
 	frameCommands.uiModifier = frameCommands.uiModifier or "whileDown"
 	
 	-- Merge library-owned settings layout into settingsUiLayout, with library-owned settings layout entries first
@@ -135,8 +131,6 @@ function boilerplate.init(initConfig, arg)
 	settingsTemplate.frameCommands = settingsTemplate.frameCommands or settingsTypes.commands("frame", {})
 	local frameCommandsSettingDefaults = settingsTemplate.frameCommands(nil) -- HACK: Get defaults by calling with settingsTemplate.frameCommands with nil
 	for commandName, inputType in pairs({
-		pause = "escape",
-		
 		toggleMouseGrab = "f1",
 		takeScreenshot = "f2",
 		toggleInfo = "f3",
@@ -147,8 +141,6 @@ function boilerplate.init(initConfig, arg)
 		scaleUp = "f10",
 		toggleFullscreen = "f11",
 		
-		uiPrimary = 1,
-		uiSecondary = 2,
 		uiModifier = "lalt"
 	}) do
 		frameCommandsSettingDefaults[commandName] = frameCommandsSettingDefaults[commandName] or inputType
@@ -166,7 +158,7 @@ function boilerplate.init(initConfig, arg)
 	config.scrollSpeed = initConfig.scrollSpeed or 20
 	config.uiPad = initConfig.uiPad or 4
 	
-	local mouseMovedDt
+	local mouseMovedDt, pausePressed
 	
 	function love.run()
 		love.load(love.arg.parseGameArguments(arg), arg)
@@ -246,7 +238,7 @@ function boilerplate.init(initConfig, arg)
 	end
 	
 	function love.update(dt)
-		if input.didFrameCommand("pause") then
+		if pausePressed then
 			if ui.current then
 				if not ui.current.ignorePausePress then
 					ui.destroy()
@@ -311,6 +303,7 @@ function boilerplate.init(initConfig, arg)
 		end
 		
 		input.stepRawCommands(paused())
+		pausePressed = false
 	end
 	
 	function love.fixedUpdate(dt)
@@ -406,6 +399,12 @@ function boilerplate.init(initConfig, arg)
 	function love.wheelmoved(x, y)
 		if ui.current then
 			ui.current.scrollAmountY = y -- Unset in ui.update
+		end
+	end
+	
+	function love.keypressed(key, scancode)
+		if key == "escape" then
+			pausePressed = true
 		end
 	end
 end
