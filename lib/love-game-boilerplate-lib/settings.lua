@@ -93,7 +93,7 @@ function types.commands(kind, default)
 			local result = {}
 			for k, v in pairs(try) do
 				if config[kind .. "Commands"][k] then
-					if pcall(settings.useScancodesForCommands and love.keyboard.isScancodeDown or love.keyboard.isKeyDown, v) or pcall(love.mouse.isDown, v) then
+					if pcall(settings.useScancodesForCommands and love.keyboard.isScancodeDown or love.keyboard.isDown, v) or pcall(love.mouse.isDown, v) then
 						result[k] = v
 					else
 						print("\"" .. v .. "\" is not a valid input to bind to a " .. kind .. " command")
