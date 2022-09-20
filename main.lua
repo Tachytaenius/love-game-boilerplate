@@ -49,7 +49,8 @@ local initConfig = {
 	defaultFilterAnisotropy = nil,
 	lineStyle = "rough",
 	scrollSpeed = 20,
-	uiPad = 4
+	uiPad = 4,
+	uiButtonPad = 2
 }
 
 local unsaved

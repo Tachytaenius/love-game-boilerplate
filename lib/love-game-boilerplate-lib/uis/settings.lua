@@ -63,7 +63,7 @@ end
 
 function settingsUI.update(state)
 	local x, y = config.canvasSystemWidth / 3, config.uiPad
-	local w, h = config.canvasSystemWidth / 3, assets.ui.font.value:getHeight() + config.uiPad
+	local w, h = config.canvasSystemWidth / 3, assets.ui.font.value:getHeight() + config.uiButtonPad
 	state.scrollOffset = math.min(0, state.scrollOffset + state.scrollAmountY * config.scrollSpeed)
 	y = y + state.scrollOffset
 	suit.layout:reset(x, y, config.uiPad)
