@@ -62,21 +62,21 @@ local function applyChanges(changes)
 end
 
 function settingsUI.update(state)
-	local pad = 4
-	local x, y = config.canvasSystemWidth / 3, pad
-	local w, h = config.canvasSystemWidth / 3, assets.ui.font.value:getHeight() + pad
+	local x, y = config.canvasSystemWidth / 3, config.uiPad
+	local w, h = config.canvasSystemWidth / 3, assets.ui.font.value:getHeight() + config.uiPad
 	state.scrollOffset = math.min(0, state.scrollOffset + state.scrollAmountY * config.scrollSpeed)
 	y = y + state.scrollOffset
-	suit.layout:reset(x, y, pad)
+	suit.layout:reset(x, y, config.uiPad)
 	
 	local rectangles = {}
 	local function finishRect()
 		if #rectangles ~= 0 then
-			rectangles[#rectangles][3], rectangles[#rectangles][4] = w + pad * 2, (suit.layout._y + pad) - rectangles[#rectangles][2] + h + pad
+			rectangles[#rectangles][3] = w + config.uiPad * 2 - 1
+			rectangles[#rectangles][4] = (suit.layout._y + config.uiPad) - rectangles[#rectangles][2] + h + config.uiPad - 1
 		end
 	end
 	
-	if suit.Button("Cancel", suit.layout:row(w/2-pad/2, h)).hit then
+	if suit.Button("Cancel", suit.layout:row(w/2-config.uiPad/2, h)).hit then
 		return true, "plainPause"
 	end
 	if suit.Button("OK", suit.layout:col()).hit then
@@ -85,8 +85,8 @@ function settingsUI.update(state)
 		settings("save")
 		return true, "plainPause"
 	end
-	suit.layout:reset(x, y + h + pad, pad)
-	if suit.Button("Reset", suit.layout:row(w/2-pad/2, h)).hit then
+	suit.layout:reset(x, y + h + config.uiPad, config.uiPad)
+	if suit.Button("Reset", suit.layout:row(w/2-config.uiPad/2, h)).hit then
 		state.changes = {}
 		settings("reset")
 		settings("apply")
@@ -99,7 +99,7 @@ function settingsUI.update(state)
 		state.changes = {}
 	end
 	
-	suit.layout:reset(x, y + h + pad * 2, pad)
+	suit.layout:reset(x, y + h + config.uiPad * 2, config.uiPad)
 	
 	local id = 1
 	
@@ -107,7 +107,7 @@ function settingsUI.update(state)
 		finishRect()
 		suit.layout:row(w, h)
 		suit.Label(category.title .. ":", {align = "left"}, suit.layout:row(w, h))
-		rectangles[#rectangles + 1] = {suit.layout._x - pad, suit.layout._y - pad}
+		rectangles[#rectangles + 1] = {suit.layout._x - config.uiPad + 0.5, suit.layout._y - config.uiPad + 0.5}
 		for i, item in ipairs(category) do
 			local settingName = item.name
 			local settingState = get(state, unpack(item))

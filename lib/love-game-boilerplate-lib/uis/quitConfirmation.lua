@@ -11,9 +11,8 @@ function quitConfirmation.construct(state)
 end
 
 function quitConfirmation.update(state)
-	local pad = 4
-	suit.layout:reset(config.canvasSystemWidth / 3, config.canvasSystemHeight / 3, pad)
-	if suit.Button("Save and quit", suit.layout:row(config.canvasSystemWidth / 3, assets.ui.font.value:getHeight() + pad)).hit then
+	suit.layout:reset(config.canvasSystemWidth / 3, config.canvasSystemHeight / 3, config.uiPad)
+	if suit.Button("Save and quit", suit.layout:row(config.canvasSystemWidth / 3, assets.ui.font.value:getHeight() + config.uiPad)).hit then
 		if require(path).save then -- HACK to avoid a circular dependency error
 			require(path).save()
 		end

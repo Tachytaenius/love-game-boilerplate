@@ -164,6 +164,7 @@ function boilerplate.init(initConfig, arg)
 	
 	config.suppressQuitWithDoubleQuitEvent = initConfig.suppressQuitWithDoubleQuitEvent
 	config.scrollSpeed = initConfig.scrollSpeed or 20
+	config.uiPad = initConfig.uiPad or 4
 	
 	local mouseMovedDt
 	
