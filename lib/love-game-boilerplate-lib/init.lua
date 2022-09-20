@@ -148,7 +148,8 @@ function boilerplate.init(initConfig, arg)
 		toggleFullscreen = "f11",
 		
 		uiPrimary = 1,
-		uiSecondary = 2
+		uiSecondary = 2,
+		uiModifier = "lalt"
 	}) do
 		frameCommandsSettingDefaults[commandName] = frameCommandsSettingDefaults[commandName] or inputType
 	end
