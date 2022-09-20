@@ -161,8 +161,11 @@ function boilerplate.init(initConfig, arg)
 	config.scrollSpeed = initConfig.scrollSpeed or 20
 	config.uiPad = initConfig.uiPad or 4
 	config.uiButtonPad = initConfig.uiButtonPad or 2
+	config.pauseInputType = initConfig.pauseInputType or "released"
 	
-	local mouseMovedDt, pausePressed
+	require(path .. ".suitTheme")
+	
+	local mouseMovedDt, pausePressed, pauseReleased
 	
 	function love.run()
 		love.load(love.arg.parseGameArguments(arg), arg)
@@ -242,7 +245,7 @@ function boilerplate.init(initConfig, arg)
 	end
 	
 	function love.update(dt)
-		if pausePressed then
+		if config.pauseInputType == "pressed" and pausePressed or config.pauseInputType == "released" and pauseReleased then
 			if ui.current then
 				if not ui.current.ignorePausePress then
 					ui.destroy()
@@ -307,7 +310,7 @@ function boilerplate.init(initConfig, arg)
 		end
 		
 		input.stepRawCommands(paused())
-		pausePressed = false
+		pausePressed, pauseReleased = false, false
 	end
 	
 	function love.fixedUpdate(dt)
@@ -409,6 +412,12 @@ function boilerplate.init(initConfig, arg)
 	function love.keypressed(key, scancode)
 		if key == "escape" then
 			pausePressed = true
+		end
+	end
+	
+	function love.keyreleased(key, scancode)
+		if key == "escape" then
+			pauseReleased = true
 		end
 	end
 end

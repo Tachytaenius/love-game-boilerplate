@@ -50,7 +50,8 @@ local initConfig = {
 	lineStyle = "rough",
 	scrollSpeed = 20,
 	uiPad = 4,
-	uiButtonPad = 2
+	uiButtonPad = 2,
+	pauseInputType = "released"
 }
 
 local unsaved
