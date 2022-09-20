@@ -32,6 +32,13 @@ local function paused()
 	return ui.current and ui.current.causesPause
 end
 
+local function getMaxScale()
+	local maxWidth, maxHeight = love.window.getDesktopDimensions(settings.graphics.display)
+	local widthScaleLimit = math.floor(maxWidth / config.canvasSystemWidth)
+	local heightScaleLimit = math.floor(maxHeight / config.canvasSystemHeight)
+	return math.min(widthScaleLimit, heightScaleLimit)
+end
+
 function boilerplate.init(initConfig, arg)
 	-- NOTE: initConfig is modified in some places
 	-- TODO: Make a table for all the input options and verify their presence, perhaps even validate them
@@ -65,7 +72,17 @@ function boilerplate.init(initConfig, arg)
 	local settingsUiLayout = {
 		{title = "Graphics",
 			{name = "Fullscreen", "graphics","fullscreen"},
-			{name = "Interpolation", "graphics","interpolation"}
+			{name = "Interpolation", "graphics","interpolation"},
+			{name = "Scale", "graphics","scale", getLimit = getMaxScale},
+			{name = "Which Display", "graphics","display", getLimit = love.window.getDisplayCount},
+			{name = "VSync", "graphics","vsync"}
+		},
+		
+		{title = "Mouse",
+			{name = "Divide by Scale", "mouse","divideByScale"},
+			{name = "X Sensitivity", "mouse","xSensitivity"},
+			{name = "Y Sensitivity", "mouse","ySensitivity"},
+			{name = "Cursor Colour", "mouse","cursorColour"}
 		}
 	}
 	
@@ -265,7 +282,7 @@ function boilerplate.init(initConfig, arg)
 			end
 			
 			if input.didFrameCommand("scaleUp") then
-				settings.graphics.scale = settings.graphics.scale + 1
+				settings.graphics.scale = math.min(getMaxScale(), settings.graphics.scale + 1)
 				settings("apply")
 				settings("save")
 			end

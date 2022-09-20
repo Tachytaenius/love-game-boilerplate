@@ -105,8 +105,23 @@ function settingsUI.update(state)
 				if suit.Checkbox({checked = settingState, text = item.name}, {id = i}, x,y,w,h).hit then
 					set(state, not settingState, unpack(item))
 				end
+			elseif settingType == types.natural then
+				suit.Label(item.name .. ": (" .. settingState .. "/" .. item.getLimit() .. ")", {align = "left"}, x,y,w,h)
+				x,y,w,h=suit.layout:row(w, h)
+				local sliderSettings = {value = settingState, min = 1, max = item.getLimit(), step = 1}
+				-- if --[=[suit.Slider call]=].changed then
+				-- The above line is not used because settings.graphics.scale's limit changes depending on the current display, which can be changed by moving the window while in the settings menu which does not refresh
+				suit.Slider(sliderSettings, {id = i}, x,y,w,h)
+				set(state, math.min(item.getLimit(), math.floor(sliderSettings.value + 0.5)), unpack(item))
+			elseif settingsType == types.rgb then
+				-- TODO
+			elseif settingsType == types.rgba then
+				-- TODO
+			elseif settingsType == types.number then
+				-- TODO
+			elseif settingsType == types.commands then
+				-- TODO
 			end
-			-- TODO: Implement more settings types
 		end
 	end
 	
