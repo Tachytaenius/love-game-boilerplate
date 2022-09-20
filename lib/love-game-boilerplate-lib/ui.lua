@@ -49,7 +49,7 @@ end
 function ui.update()
 	assert(ui.current, "Can't update UI without a UI")
 	
-	suit.updateMouse(ui.current.mouseX, ui.current.mouseY, love.mouse.isDown(1))
+	suit.updateMouse(ui.current.mouseX, ui.current.mouseY, love.mouse.isDown(1) and not require(path).disableMouseButtonUntilReleased) -- HACK to avoid a circular dependency error
 	
 	local destroy, typeToTransitionTo = ui.uis[ui.current.type].update(ui.current)
 	if destroy then
