@@ -17,6 +17,8 @@ local boilerplate = {}
 boilerplate.settingsTypes = settings("meta")
 boilerplate.assetsConstructors, boilerplate.assetsUtilities = assets("meta")
 
+boilerplate.config = config
+
 function boilerplate.remakeWindow()
 	local width = config.canvasSystemWidth * settings.graphics.scale
 	local height = config.canvasSystemHeight * settings.graphics.scale
