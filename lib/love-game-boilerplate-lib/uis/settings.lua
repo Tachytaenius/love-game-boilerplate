@@ -149,7 +149,8 @@ function settingsUI.update(state)
 	
 	function state.draw()
 		for _, rectangle in ipairs(rectangles) do
-			love.graphics.rectangle("line", unpack(rectangle))
+			-- NOTE: We can bring these back if we do theming
+			-- love.graphics.rectangle("line", unpack(rectangle))
 		end
 	end
 end
