@@ -66,8 +66,6 @@ function boilerplate.init(initConfig, arg)
 	frameCommands.uiPrimary = frameCommands.uiPrimary or "whileDown"
 	frameCommands.uiSecondary = frameCommands.uiSecondary or "whileDown"
 	frameCommands.uiModifier = frameCommands.uiModifier or "whileDown"
-	frameCommands.uiScrollUp = frameCommands.uiScrollUp or "whileDown"
-	frameCommands.uiScrollDown = frameCommands.uiScrollDown or "whileDown"
 	
 	-- Merge library-owned settings layout into settingsUiLayout, with library-owned settings layout entries first
 	
