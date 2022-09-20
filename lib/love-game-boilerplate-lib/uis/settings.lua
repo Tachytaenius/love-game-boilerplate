@@ -102,10 +102,9 @@ function settingsUI.update(state)
 			local settingType = typeInstanceOrigins[current]
 			local x,y,w,h=suit.layout:row(w, h)
 			if settingType == types.boolean then
-				if suit.ImageButton((settingState and trueButton or falseButton).value, {id = i}, x,y,w,h).hit then
+				if suit.Checkbox({checked = settingState, text = item.name}, {id = i}, x,y,w,h).hit then
 					set(state, not settingState, unpack(item))
 				end
-				suit.Label(item.name, {align = "right"}, x,y,w,h)
 			end
 			-- TODO: Implement more settings types
 		end
