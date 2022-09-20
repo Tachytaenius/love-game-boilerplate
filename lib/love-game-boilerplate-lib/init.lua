@@ -17,7 +17,11 @@ local boilerplate = {}
 boilerplate.settingsTypes = settings("meta")
 boilerplate.assetsConstructors, boilerplate.assetsUtilities = assets("meta")
 
+boilerplate.settings = settings
 boilerplate.config = config
+boilerplate.input = input
+boilerplate.assets = assets
+boilerplate.ui = ui
 
 function boilerplate.remakeWindow()
 	local width = config.canvasSystemWidth * settings.graphics.scale
