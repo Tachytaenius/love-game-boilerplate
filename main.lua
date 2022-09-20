@@ -33,8 +33,8 @@ local assets = {
 
 local initConfig = {
 	fixedUpdateTickLength = 1 / 24,
-	canvasSystemWidth = 384,
-	canvasSystemHeight = 256,
+	canvasSystemWidth = 480,
+	canvasSystemHeight = 270,
 	frameCommands = frameCommands,
 	fixedCommands = fixedCommands,
 	settingsUiLayout = settingsUiLayout,
