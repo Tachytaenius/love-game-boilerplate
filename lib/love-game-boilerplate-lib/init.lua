@@ -22,6 +22,7 @@ boilerplate.config = config
 boilerplate.input = input
 boilerplate.assets = assets
 boilerplate.ui = ui
+boilerplate.suit = suit
 
 function boilerplate.remakeWindow()
 	local width = config.canvasSystemWidth * settings.graphics.scale
