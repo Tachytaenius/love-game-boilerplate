@@ -71,7 +71,9 @@ function boilerplate.init(initConfig, arg)
 			{name = "Interpolation", "graphics","interpolation"},
 			{name = "Scale", "graphics","scale", getLimit = getMaxScale},
 			{name = "Which Display", "graphics","display", getLimit = love.window.getDisplayCount},
-			{name = "VSync", "graphics","vsync"}
+			{name = "VSync", "graphics","vsync"},
+			{name = "Max Ticks per Frame", "graphics","maxTicksPerFrame", getLimit = function() return 8 end},
+			{name = "Show Performance", "graphics","showPerformance"}
 		},
 		
 		{title = "Mouse",
@@ -119,6 +121,7 @@ function boilerplate.init(initConfig, arg)
 	settingsTemplate.graphics.display = settingsTemplate.graphics.display or settingsTypes.natural(1)
 	settingsTemplate.graphics.maxTicksPerFrame = settingsTemplate.graphics.maxTicksPerFrame or settingsTypes.natural(4)
 	settingsTemplate.graphics.vsync = settingsTemplate.graphics.vsync or settingsTypes.boolean(true)
+	settingsTemplate.graphics.showPerformance = settingsTemplate.graphics.showPerformance or settingsTypes.boolean(false)
 	
 	settingsTemplate.mouse = settingsTemplate.mouse or {}
 	settingsTemplate.mouse.divideByScale = settingsTypes.boolean(true)
