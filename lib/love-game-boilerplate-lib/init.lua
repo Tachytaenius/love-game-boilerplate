@@ -266,8 +266,12 @@ function boilerplate.init(initConfig, arg)
 		end
 		
 		if input.checkFrameUpdateCommand("takeScreenshot") then
-			-- If uiModifier is held then takeScreenshot will include HUD et cetera.
-			takeScreenshot(input.checkFrameUpdateCommand("uiModifier") and boilerplate.outputCanvas or boilerplate.gameCanvas)
+			-- If uiModifier is held then takeScreenshot will exclude HUD et cetera.
+			if input.checkFrameUpdateCommand("uiModifier") then
+				takeScreenshot(boilerplate.gameCanvas, "game")
+			else
+				takeScreenshot(boilerplate.outputCanvas, "game & HUD")
+			end
 		end
 		
 		if not ui.current or ui.current.type ~= "settings" then
