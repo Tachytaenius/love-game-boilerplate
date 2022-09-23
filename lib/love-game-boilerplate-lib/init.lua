@@ -355,8 +355,8 @@ function boilerplate.init(initConfig, arg)
 			love.graphics.setColor(initConfig.uiTint or {1, 1, 1})
 		end
 		love.graphics.draw(boilerplate.gameCanvas)
+		love.graphics.setColor(1, 1, 1)
 		if settings.graphics.showPerformance then
-			love.graphics.setColor(1, 1, 1)
 			love.graphics.setShader(boilerplate.outlineShader)
 			boilerplate.outlineShader:send("windowSize", {config.canvasSystemWidth, config.canvasSystemHeight})
 			love.graphics.draw(boilerplate.infoCanvas, 1, 1)
@@ -369,10 +369,10 @@ function boilerplate.init(initConfig, arg)
 			end
 			love.graphics.setColor(settings.mouse.cursorColour)
 			love.graphics.draw(assets.ui.cursor.value, math.floor(ui.current.mouseX), math.floor(ui.current.mouseY))
+			love.graphics.setColor(1, 1, 1)
 		else
 			love.graphics.draw(boilerplate.hudCanvas)
 		end
-		love.graphics.setColor(1, 1, 1)
 		love.graphics.setCanvas()
 		
 		love.graphics.draw(boilerplate.outputCanvas,
