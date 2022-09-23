@@ -245,6 +245,7 @@ function boilerplate.init(initConfig, arg)
 		boilerplate.hudCanvas = love.graphics.newCanvas(config.canvasSystemWidth, config.canvasSystemHeight)
 		boilerplate.infoCanvas = love.graphics.newCanvas(config.canvasSystemWidth, config.canvasSystemHeight)
 		boilerplate.outputCanvas = love.graphics.newCanvas(config.canvasSystemWidth, config.canvasSystemHeight)
+		boilerplate.outlineShader = love.graphics.newShader(path:gsub("%.", "/") .. "/shaders/outline.glsl")
 		if boilerplate.load then
 			boilerplate.load(arg, unfilteredArg)
 		end
@@ -357,6 +358,7 @@ function boilerplate.init(initConfig, arg)
 		if settings.graphics.showPerformance then
 			love.graphics.setColor(1, 1, 1)
 			love.graphics.setShader(boilerplate.outlineShader)
+			boilerplate.outlineShader:send("windowSize", {config.canvasSystemWidth, config.canvasSystemHeight})
 			love.graphics.draw(boilerplate.infoCanvas, 1, 1)
 			love.graphics.setShader()
 		end
