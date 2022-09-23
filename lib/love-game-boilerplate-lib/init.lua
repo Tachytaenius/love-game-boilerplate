@@ -345,17 +345,21 @@ function boilerplate.init(initConfig, arg)
 				"Tick time: " .. (performance and math.floor(performance * 100 + 0.5) .. "%" or "N/A"),
 			1, 1)
 		end
+		
 		if boilerplate.draw and not paused() then
 			-- Draw to input canvas
 			boilerplate.draw(settings.graphics.interpolation and lerp or 1, dt, performance)
 		end
+		
 		love.graphics.setCanvas(boilerplate.outputCanvas)
 		love.graphics.clear(0, 0, 0, 1)
+		
 		if ui.current then
 			love.graphics.setColor(initConfig.uiTint or {1, 1, 1})
 		end
 		love.graphics.draw(boilerplate.gameCanvas)
 		love.graphics.setColor(1, 1, 1)
+		
 		if ui.current then
 			suit.draw()
 			if ui.current.draw then
@@ -367,12 +371,14 @@ function boilerplate.init(initConfig, arg)
 		else
 			love.graphics.draw(boilerplate.hudCanvas)
 		end
+		
 		if settings.graphics.showPerformance then
 			love.graphics.setShader(boilerplate.outlineShader)
 			boilerplate.outlineShader:send("windowSize", {config.canvasSystemWidth, config.canvasSystemHeight})
 			love.graphics.draw(boilerplate.infoCanvas, 1, 1)
 			love.graphics.setShader()
 		end
+		
 		love.graphics.setCanvas()
 		
 		love.graphics.draw(boilerplate.outputCanvas,
