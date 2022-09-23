@@ -356,12 +356,6 @@ function boilerplate.init(initConfig, arg)
 		end
 		love.graphics.draw(boilerplate.gameCanvas)
 		love.graphics.setColor(1, 1, 1)
-		if settings.graphics.showPerformance then
-			love.graphics.setShader(boilerplate.outlineShader)
-			boilerplate.outlineShader:send("windowSize", {config.canvasSystemWidth, config.canvasSystemHeight})
-			love.graphics.draw(boilerplate.infoCanvas, 1, 1)
-			love.graphics.setShader()
-		end
 		if ui.current then
 			suit.draw()
 			if ui.current.draw then
@@ -372,6 +366,12 @@ function boilerplate.init(initConfig, arg)
 			love.graphics.setColor(1, 1, 1)
 		else
 			love.graphics.draw(boilerplate.hudCanvas)
+		end
+		if settings.graphics.showPerformance then
+			love.graphics.setShader(boilerplate.outlineShader)
+			boilerplate.outlineShader:send("windowSize", {config.canvasSystemWidth, config.canvasSystemHeight})
+			love.graphics.draw(boilerplate.infoCanvas, 1, 1)
+			love.graphics.setShader()
 		end
 		love.graphics.setCanvas()
 		
