@@ -170,8 +170,6 @@ function boilerplate.init(initConfig, arg)
 	config.uiButtonPad = initConfig.uiButtonPad or 2
 	config.pauseInputType = initConfig.pauseInputType or "released"
 	
-	require(path .. ".suitTheme")
-	
 	local mouseMovedDt, pausePressed, pauseReleased
 	
 	function love.run()
