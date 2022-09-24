@@ -12,8 +12,8 @@ function plainPause.construct(state)
 end
 
 function plainPause.update(state)
-	suit.layout:reset(config.canvasSystemWidth / 3, config.canvasSystemHeight / 3, config.uiPad)
-	if suit.Button("Resume", suit.layout:row(config.canvasSystemWidth / 3, assets.ui.font.value:getHeight() + config.uiButtonPad)).hit then
+	suit.layout:reset(config.canvasSystemWidth / 4, config.canvasSystemHeight / 3, config.uiPad)
+	if suit.Button("Resume", suit.layout:row(config.canvasSystemWidth / 2, assets.ui.font.value:getHeight() + config.uiButtonPad)).hit then
 		return true -- Destroy UI
 	end
 	if suit.Button("Release Mouse", suit.layout:row()).hit then
