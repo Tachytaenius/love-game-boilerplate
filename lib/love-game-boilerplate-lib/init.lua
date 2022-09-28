@@ -184,7 +184,7 @@ function boilerplate.init(initConfig, arg)
 	config.windowTitle = initConfig.windowTitle
 	config.windowIconImageData = initConfig.windowIconImageData
 	
-	local mouseMovedDt, pausePressed, pauseReleased
+	local pausePressed, pauseReleased
 	
 	function love.run()
 		love.load(love.arg.parseGameArguments(arg), arg)
@@ -207,7 +207,6 @@ function boilerplate.init(initConfig, arg)
 			
 			do -- Update
 				local delta = love.timer.step()
-				mouseMovedDt = delta -- HACK
 				lag = math.min(lag + delta, initConfig.fixedUpdateTickLength * settings.graphics.maxTicksPerFrame)
 				local frames = math.floor(lag / initConfig.fixedUpdateTickLength)
 				lag = lag % initConfig.fixedUpdateTickLength
@@ -419,8 +418,8 @@ function boilerplate.init(initConfig, arg)
 			if ui.current then
 				ui.mouse(dx, dy)
 			else
-				boilerplate.fixedMouseDx = boilerplate.fixedMouseDx + dx * (mouseMovedDt or 0)
-				boilerplate.fixedMouseDy = boilerplate.fixedMouseDy + dy * (mouseMovedDt or 0)
+				boilerplate.fixedMouseDx = boilerplate.fixedMouseDx + dx
+				boilerplate.fixedMouseDy = boilerplate.fixedMouseDy + dy
 			end
 		end
 	end
