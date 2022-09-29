@@ -91,10 +91,6 @@ function boilerplate.save()
 	unsaved = false
 end
 
-function boilerplate.quit()
-	
-end
-
 function boilerplate.killThreads()
 	
 end
