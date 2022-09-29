@@ -95,4 +95,8 @@ function boilerplate.quit()
 	
 end
 
+function boilerplate.killThreads()
+	
+end
+
 boilerplate.init(initConfig, arg)
