@@ -19,7 +19,18 @@ function log.start()
 		log.out("Error", "There is already a non-folder item called logs. Rename it or move it to store logs other than latest.log")
 		return
 	end
-	log.currentLogPath = "logs/" .. os.date("%Y-%m-%d %H-%M-%S") .. ".log" -- TODO: Append 1, 2, 3 etc if another file is found with the same name, just like with screenshots
+	local dateTime = os.date("%Y-%m-%d %H-%M-%S")
+	local currentIdentifier = 1
+	local currentPath
+	local function generatePath()
+		currentPath = "logs/" .. dateTime .. " " .. currentIdentifier .. ".log"
+	end
+	generatePath()
+	while love.filesystem.getInfo(currentPath) do
+		currentIdentifier = currentIdentifier + 1
+		generatePath()
+	end
+	log.currentLogPath = currentPath
 end
 
 function log.info(message)
