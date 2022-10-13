@@ -91,8 +91,12 @@ function boilerplate.save()
 	unsaved = false
 end
 
+function boilerplate.onQuit()
+	-- Run before killThreads
+end
+
 function boilerplate.killThreads()
-	
+	return true
 end
 
 boilerplate.init(initConfig, arg)
