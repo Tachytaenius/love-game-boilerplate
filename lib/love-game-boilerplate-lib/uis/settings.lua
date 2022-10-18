@@ -13,6 +13,7 @@ local settingsUI = {}
 function settingsUI.construct(state)
 	state.causesPause = true
 	state.scrollOffset = 0
+	state.totalHeight = 0 -- Initialised on update
 	state.changes = {}
 end
 
@@ -78,6 +79,7 @@ function settingsUI.update(state)
 	if suit.Button("Cancel", suit.layout:row(w/2-config.uiPad/2, h)).hit then
 		return true, "plainPause"
 	end
+	state.totalHeight = state.totalHeight + h + config.uiPad
 	if suit.Button("OK", suit.layout:col()).hit then
 		applyChanges(state.changes)
 		settings("apply", suppressRemakeWindow) -- TODO: Define the variable
@@ -91,6 +93,7 @@ function settingsUI.update(state)
 		settings("apply")
 		settings("save")
 	end
+	state.totalHeight = state.totalHeight + h + config.uiPad
 	if suit.Button("Apply", suit.layout:col()).hit then
 		applyChanges(state.changes)
 		settings("apply")
@@ -102,10 +105,14 @@ function settingsUI.update(state)
 	
 	local id = 1
 	
+	state.totalHeight = 0 -- (Re)initialise
+	state.totalHeight = state.totalHeight + h + config.uiPad * 2 -- Seems to be required
 	for _, category in ipairs(uiLayout) do
 		finishRect()
 		suit.layout:row(w, h)
+		state.totalHeight = state.totalHeight + h + config.uiPad
 		suit.Label(category.title .. ":", {align = "left"}, suit.layout:row(w, h))
+		state.totalHeight = state.totalHeight + h + config.uiPad
 		rectangles[#rectangles + 1] = {suit.layout._x - config.uiPad + 0.5, suit.layout._y - config.uiPad + 0.5}
 		for i, item in ipairs(category) do
 			local settingName = item.name
@@ -118,6 +125,7 @@ function settingsUI.update(state)
 			assert(type(current) == "function", "Settings UI layout references nonexistent setting")
 			local settingType = typeInstanceOrigins[current]
 			local x,y,w,h=suit.layout:row(w, h)
+			state.totalHeight = state.totalHeight + h + config.uiPad
 			if settingType == types.boolean then
 				if suit.Checkbox({checked = settingState, text = item.name}, {id = id}, x,y,w,h).hit then
 					set(state, not settingState, unpack(item))
@@ -126,6 +134,7 @@ function settingsUI.update(state)
 			elseif settingType == types.natural then
 				suit.Label(item.name .. ": (" .. settingState .. "/" .. item.getLimit() .. ")", {align = "left"}, x,y,w,h)
 				x,y,w,h=suit.layout:row(w, h)
+				state.totalHeight = state.totalHeight + h + config.uiPad
 				local sliderSettings = {value = settingState, min = 1, max = item.getLimit(), step = 1}
 				-- if --[=[suit.Slider call]=].changed then
 				-- The above line is not used because settings.graphics.scale's limit changes depending on the current display, which can be changed by moving the window while in the settings menu which does not refresh
@@ -145,6 +154,7 @@ function settingsUI.update(state)
 					{align = "left"}, x,y,w,h
 				)
 				x,y,w,h=suit.layout:row(w, h)
+				state.totalHeight = state.totalHeight + h + config.uiPad
 				local sliderSettings = {value = settingState, min = item.getLowLimit(), max = item.getLimit()}
 				suit.Slider(sliderSettings, {id = id}, x,y,w,h)
 				set(state, math.max(item.getLowLimit(), math.min(item.getLimit(), sliderSettings.value)), unpack(item))

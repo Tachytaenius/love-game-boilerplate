@@ -61,7 +61,9 @@ function ui.update()
 		end
 	else
 		if ui.current.scrollOffset then
-			ui.current.scrollOffset = math.min(0, ui.current.scrollOffset + ui.current.scrollAmountY * config.scrollSpeed)
+			local canvasSystemHeight = require(path).config.canvasSystemHeight -- HACK to avoid a circular dependency error
+			local scrollPos = ui.current.scrollOffset + ui.current.scrollAmountY * config.scrollSpeed
+			ui.current.scrollOffset = math.min(0, math.max(-(ui.current.totalHeight - canvasSystemHeight), scrollPos))
 		end
 		ui.current.scrollAmountY = 0
 	end
