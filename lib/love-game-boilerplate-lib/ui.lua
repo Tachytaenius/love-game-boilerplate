@@ -31,6 +31,7 @@ function ui.construct(type)
 end
 
 function ui.destroy()
+	assert(ui.current, "Can't destroy UI without a UI")
 	ui.current = nil
 	suit.updateMouse(nil, nil, false)
 	suit.exitFrame()
