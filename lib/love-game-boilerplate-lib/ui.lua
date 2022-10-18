@@ -59,6 +59,9 @@ function ui.update()
 			ui.destroy()
 		end
 	else
+		if ui.current.scrollOffset then
+			ui.current.scrollOffset = math.min(0, ui.current.scrollOffset + ui.current.scrollAmountY * config.scrollSpeed)
+		end
 		ui.current.scrollAmountY = 0
 	end
 end
